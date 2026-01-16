@@ -8,31 +8,27 @@ namespace L2Automation.Demo.Controllers;
 [Route("api/events")]
 public class MachineEventsController : ControllerBase
 {
+    private readonly EventProcessor _processor;
     private readonly EventStore _eventStore;
-    private readonly MachineStateService _stateService;
 
-    public MachineEventsController(EventStore eventStore, MachineStateService stateService)
+    public MachineEventsController(EventProcessor processor, EventStore eventStore)
     {
+        _processor = processor;
         _eventStore = eventStore;
-        _stateService = stateService;
     }
 
     [HttpPost]
     public IActionResult PostEvent(MachineEvent machineEvent)
     {
-        _stateService.ApplyEvent(machineEvent.EventType);
-        _eventStore.Add(machineEvent);
+        var state = _processor.Process(machineEvent);
 
         return Ok(new
         {
-            State = _stateService.CurrentState,
+            State = state,
             EventId = machineEvent.Id
         });
     }
 
     [HttpGet]
-    public IActionResult GetEvents()
-    {
-        return Ok(_eventStore.GetAll());
-    }
+    public IActionResult GetEvents() => Ok(_eventStore.GetAll());
 }
