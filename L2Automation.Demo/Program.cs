@@ -8,6 +8,10 @@ builder.Services.AddSingleton<MachineStateService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IntervalStore>();
+builder.Services.AddSingleton<ProductionStore>();
+builder.Services.AddSingleton<EventProcessor>();
+
 
 var app = builder.Build();
 
